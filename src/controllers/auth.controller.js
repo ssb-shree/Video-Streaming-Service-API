@@ -22,11 +22,6 @@ const registerUser = async (req, res) => {
     return res.status(409).json({ message: "Invalid Email Format Received", success: false });
   }
 
-  //hash pass using bcrypt
-  // upload logo to cloudinary
-  // create the new user with channel name, phone, email, password, logoID,logo_url secure
-  // return user details in respone
-
   try {
     // check if email or phone is taken
     const isTaken = await User.findOne({
