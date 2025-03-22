@@ -1,0 +1,24 @@
+# Dependencies  
+node_modules  
+
+# Build files  
+dist  
+build  
+
+# Environment files  
+.env  
+
+# Lock files (should not be formatted)  
+package-lock.json
+
+# Uploaded files (if applicable)  
+public/
+
+# Logs  
+logs  
+
+# Git-related  
+.gitignore  
+
+# Miscellaneous  
+README.md  

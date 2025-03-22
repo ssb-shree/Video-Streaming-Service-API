@@ -1,0 +1,56 @@
+{
+  "name": "video-streaming-api",
+  "version": "1.0.0",
+  "description": "A backend API for a video streaming platform with authentication, video uploading, watching, commenting, and engagement features like likes and dislikes.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssb-shree/Video-Streaming-Service-API.git"
+  },
+  "keywords": [
+    "\"video",
+    "streaming\"",
+    "\"video",
+    "api\"",
+    "\"node.js\"",
+    "\"express\"",
+    "\"REST",
+    "API\"",
+    "\"authentication\"",
+    "\"video",
+    "platform\"",
+    "\"media",
+    "streaming\"",
+    "\"video",
+    "sharing\"",
+    "\"backend\"",
+    "\"fullstack\"",
+    "\"MERN\"",
+    "\"likes\"",
+    "\"comments\"",
+    "\"video",
+    "service\""
+  ],
+  "author": "Shree Bavachikar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ssb-shree/Video-Streaming-Service-API/issues"
+  },
+  "homepage": "https://github.com/ssb-shree/Video-Streaming-Service-API#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  }
+}
