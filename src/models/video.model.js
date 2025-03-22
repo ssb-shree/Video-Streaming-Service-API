@@ -12,7 +12,7 @@ const videoSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    user_id: {
+    userID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -27,7 +27,12 @@ const videoSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    thumbnailId: {
+    thumbnailID: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    videoID: {
       type: String,
       required: true,
       trim: true,

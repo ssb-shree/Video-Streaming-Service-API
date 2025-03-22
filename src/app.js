@@ -18,9 +18,11 @@ app.use(
 
 // Import Routes Below
 import authRouter from "./routes/auth.routes.js";
+import videoRouter from "./routes/video.route.js";
 
 // Route Declaration Below
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/videos", videoRouter);
 
 app.get("/ping", async (req, res) => res.status(200).json({ message: "pong" }));
 
