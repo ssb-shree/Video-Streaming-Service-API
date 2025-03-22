@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
@@ -57,8 +58,52 @@ const registerUser = async (req, res) => {
   }
 };
 
-const loginUser = async (req, res) => {};
+const loginUser = async (req, res) => {
+  // get all the info from body
+  const { email, password } = req.body;
+
+  // check for empty fields
+  if (!email || !password) {
+    return res.status(409).json({ message: "Empty Fields, All fields are required", success: false });
+  }
+
+  // test email using regex
+  if (!emailRegex.test(email)) {
+    return res.status(409).json({ message: "Invalid Email Format Received", success: false });
+  }
+
+  try {
+    // check if this user exist
+    const findUser = await User.findOne({ email });
+    if (!findUser) return res.status(404).json({ message: "User does not exist", success: false });
+
+    // compare the passwords
+    const isPassValid = await bcrypt.compare(password, findUser.password);
+    if (!isPassValid) return res.status(409).json({ message: "Incorrect Email or Password", success: false });
+
+    // create a token/cookie if above all checks passed
+    const token = jwt.sign({ ID: findUser._id, email: findUser.email }, process.env.JWT_SECRET, { expiresIn: "10d" });
+
+    // set the cookie in users browser
+    res.cookie("jwt", token);
+
+    // send the final response
+    res.status(200).json({
+      message: "User Logged In Successfully",
+      userData: { ...findUser._doc, password: null },
+      token,
+      success: true,
+    });
+  } catch (error) {
+    console.log(`Error in Registering User ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Login User Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
 
 const logoutUser = async (req, res) => {};
 
-export { registerUser };
+export { registerUser, loginUser };
