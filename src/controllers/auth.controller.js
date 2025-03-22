@@ -85,7 +85,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ ID: findUser._id, email: findUser.email }, process.env.JWT_SECRET, { expiresIn: "10d" });
 
     // set the cookie in users browser
-    res.cookie("jwt", token);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: 10 * 24 * 60 * 60 * 1000 });
 
     // send the final response
     res.status(200).json({
@@ -104,6 +104,22 @@ const loginUser = async (req, res) => {
   }
 };
 
-const logoutUser = async (req, res) => {};
+const logoutUser = async (req, res) => {
+  try {
+    res.cookie("jwt", null, {
+      maxAge: 0,
+      httpOnly: true,
+    });
 
-export { registerUser, loginUser };
+    res.status(200).json({ message: "User Logged Out Successfully", success: true });
+  } catch (error) {
+    console.log(`Error in Registering User ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Logout User Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { registerUser, loginUser, logoutUser };
