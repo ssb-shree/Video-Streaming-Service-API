@@ -37,7 +37,10 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // upload the logo to cloudinary
-    const { secure_url, public_id } = await cloudinary.uploader.upload(req.files.logo.tempFilePath);
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.files.logo.tempFilePath, {
+      resource_type: "image",
+      folder: "video-streaming-service-api/pfps",
+    });
 
     // create the new user
     const newUSer = await User.create({
