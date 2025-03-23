@@ -110,4 +110,34 @@ const updateVideo = async (req, res) => {
   }
 };
 
-export { uploadVideo, updateVideo };
+const deleteVideo = async (req, res) => {
+  // check if id is provided
+  const { videoID } = req.params;
+  if (!videoID) return res.status(409).json({ message: "Video ID was not provided", success: false });
+
+  try {
+    // find the video using video ID
+    const findVideo = await Video.findById(videoID);
+    if (!findVideo) return res.status(404).json({ message: "Video not found, Invalid id provided", success: false });
+
+    // check video to be deleted is uploaded by the current user
+    if (findVideo.userID.toString() !== req.user.ID.toString())
+      return res.status(403).json({ message: "Unauthorized request ", success: false });
+
+    // now clean up the cloud storage
+    await cloudinary.uploader.destroy(findVideo.thumbnailID, { resource_type: "image" });
+    await cloudinary.uploader.destroy(findVideo.videoID, { resource_type: "video" });
+
+    // send the final response of succcess
+    res.status(200).json({ message: "Video Deleted Successfully!", success: true });
+  } catch (error) {
+    console.log(`Error in Deleting Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Delete Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { uploadVideo, updateVideo, deleteVideo };
