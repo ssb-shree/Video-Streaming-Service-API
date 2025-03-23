@@ -17,7 +17,7 @@ app.use(
 );
 
 // Import Routes Below
-import authRouter from "./routes/auth.routes.js";
+import authRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.route.js";
 
 // Route Declaration Below
