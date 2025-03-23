@@ -17,12 +17,14 @@ app.use(
 );
 
 // Import Routes Below
-import authRouter from "./routes/user.routes.js";
+import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.route.js";
+import commentRouter from "./routes/comment.routes.js";
 
 // Route Declaration Below
-app.use("/api/v1/users", authRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/videos", videoRouter);
+app.use("/api/v1/comments", commentRouter);
 
 app.get("/ping", async (req, res) => res.status(200).json({ message: "pong" }));
 
