@@ -58,4 +58,56 @@ const uploadVideo = async (req, res) => {
   }
 };
 
-export { uploadVideo };
+const updateVideo = async (req, res) => {
+  const { title, description, category, tags } = req.body;
+  // no empty field check if empty put the old fields
+
+  const { videoID } = req.params;
+  if (!videoID) return res.status(409).json({ message: "no video id was provided to update", success: false });
+
+  try {
+    // find the video using
+    const findVideo = await Video.findById(videoID);
+    if (!findVideo)
+      return res.status(404).json({ message: "Video not found, invalid video id provided", success: false });
+
+    // check if the video to be updated is uploaded by the current user
+    if (findVideo.userID.toString() !== req.user.ID.toString())
+      return res.status(403).json({ message: "Unauthorized request ", success: false });
+
+    // incase new thumbnail is provided
+    if (req.files && req.files.thumbnail) {
+      // destroy the old thumbnail from cloud
+      await cloudinary.uploader.destroy(findVideo.thumbnailID);
+      // upload the new thumbnail
+      const newThumbNail = await cloudinary.uploader.upload(req.files.thumbnail.tempFilePath, {
+        resource_type: "image",
+        folder: "video-streaming-service-api/thumbnails",
+      });
+
+      // update the video doc with new url and id
+      findVideo.thumbnailID = newThumbNail.public_id;
+      findVideo.thumbnailUrl = newThumbNail.secure_url;
+    }
+
+    // now update the rest of meta data
+    findVideo.title = title || findVideo.title;
+    findVideo.description = description || findVideo.description;
+    findVideo.category = category || findVideo.category;
+    findVideo.tags = tags ? tags.split(",") : findVideo.tags;
+
+    // save the changes and send a success response
+    const updatedVideo = await findVideo.save();
+
+    res.status(200).json({ message: "video updated successfully", success: true, data: updatedVideo });
+  } catch (error) {
+    console.log(`Error in Updating Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Update Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { uploadVideo, updateVideo };
