@@ -2,16 +2,24 @@ import { Router } from "express";
 
 const router = Router();
 
-import { registerUser, loginUser, logoutUser, updateUserProfile } from "../controllers/user.controller.js";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+  updateUserProfile,
+  subscribeToChannel,
+} from "../controllers/user.controller.js";
 
 import { checkAuth } from "../middlewares/auth.middleware.js";
 
-router.post("/register", registerUser);
+router.post("/auth/register", registerUser);
 
-router.post("/login", loginUser);
+router.post("/auth/login", loginUser);
 
-router.get("/logout", checkAuth, logoutUser);
+router.get("/auth/logout", checkAuth, logoutUser);
 
-router.put("/update", checkAuth, updateUserProfile);
+router.put("/auth/update", checkAuth, updateUserProfile);
+
+router.post("/subscribe/:channelID", subscribeToChannel);
 
 export default router;
