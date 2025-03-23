@@ -4,12 +4,14 @@ const router = Router();
 
 import { checkAuth } from "../middlewares/auth.middleware.js";
 
-import { createComment, editComment, deleteComment } from "../controllers/comment.controller.js";
+import { createComment, editComment, deleteComment, getCommentsByVideo } from "../controllers/comment.controller.js";
 
 router.post("/create", checkAuth, createComment);
 
-router.post("/edit/:commentID", checkAuth, editComment);
+router.put("/edit/:commentID", checkAuth, editComment);
 
-router.post("/edit/:commentID", checkAuth, deleteComment);
+router.delete("/delete/:commentID", checkAuth, deleteComment);
+
+router.get("/get/:videoID", getCommentsByVideo);
 
 export default router;

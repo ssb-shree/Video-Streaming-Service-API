@@ -56,4 +56,21 @@ const deleteComment = async (req, res) => {
   }
 };
 
-export { createComment, editComment, deleteComment };
+const getCommentsByVideo = async (req, res) => {
+  const { videoID } = req.params;
+  if (!videoID) return res.status(403).json({ message: "Video ID not provided", success: false });
+
+  try {
+    const allComments = await Comment.find({ videoID });
+    res.status(200).json({ message: "found comments successfully", success: true, data: allComments });
+  } catch (error) {
+    console.log(`Error in Deleting Comment ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Delete Comment Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { createComment, editComment, deleteComment, getCommentsByVideo };
