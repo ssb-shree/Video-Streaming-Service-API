@@ -195,7 +195,8 @@ const getVideoByTages = async (req, res) => {
     const videos = await Video.find({ tags: tag }).sort({ createdAt: -1 });
     res.status(200).json({ data: videos, success: true });
   } catch (error) {
-    console.log(`Error in Finding Your Video ${error.message || error}`);
+    console.log(`Error in Finding Your Video Through Tags ${error.message || error}`);
+    console.log(error);
     res.status(500).json({
       message: "Unable to Get Your Video Right Now Try Again Later",
       error: error.message || error,
@@ -209,9 +210,53 @@ const getVideoByCategory = async (req, res) => {
     const videos = await Video.find({ category: req.params.category }).sort({ createdAt: -1 });
     res.status(200).json({ data: videos, success: true });
   } catch (error) {
-    console.log(`Error in Finding Your Video ${error.message || error}`);
+    console.log(`Error in Finding Your Video Through Category ${error.message || error}`);
     res.status(500).json({
       message: "Unable to Get Your Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+const likeVideo = async (req, res) => {
+  try {
+    const { videoID } = req.params;
+
+    await Video.findByIdAndUpdate(
+      videoID,
+      {
+        $addToSet: { likedBy: req.user.ID }, // Adds userID to Likes Array if not there
+        $pull: { dislikedBy: req.user.ID }, // Removes from dislikes if previously disliked
+      },
+      { new: true },
+    );
+
+    res.status(200).json({ message: "Liked the video", success: true });
+  } catch (error) {
+    console.log(`Error in Adding Like To The Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Like Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+const dislikeVideo = async (req, res) => {
+  try {
+    const { videoID } = req.params;
+
+    await Video.findByIdAndUpdate(videoID, {
+      $addToSet: { dislikedBy: req.user.ID }, // Adds userID to Dislikes Array if not there
+      $pull: { likedBy: req.user.ID }, // Removes from likes if previously liked
+    });
+
+    res.status(200).json({ message: "DisLiked the video", success: true });
+  } catch (error) {
+    console.log(`Error in Adding DisLike To The Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Dislike Video Right Now Try Again Later",
       error: error.message || error,
       success: false,
     });
@@ -227,4 +272,6 @@ export {
   findVideoByID,
   getVideoByTages,
   getVideoByCategory,
+  likeVideo,
+  dislikeVideo,
 };

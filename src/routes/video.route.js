@@ -11,6 +11,8 @@ import {
   findVideoByID,
   getVideoByTages,
   getVideoByCategory,
+  likeVideo,
+  dislikeVideo,
 } from "../controllers/video.controller.js";
 
 import { checkAuth } from "../middlewares/auth.middleware.js";
@@ -30,5 +32,9 @@ router.get("/find/:videoID", findVideoByID);
 router.get("/tags/:tag", getVideoByTages);
 
 router.get("/category/:category", getVideoByCategory);
+
+router.post("/like/:videoID", checkAuth, likeVideo);
+
+router.post("/dislike/:videoID", checkAuth, dislikeVideo);
 
 export default router;

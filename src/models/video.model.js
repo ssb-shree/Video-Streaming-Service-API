@@ -61,7 +61,7 @@ videoSchema.virtual("likes").get(function () {
 });
 
 videoSchema.virtual("dislikes").get(function () {
-  return this.disLikedBy.length;
+  return this.dislikedBy.length;
 });
 
 videoSchema.virtual("views").get(function () {
