@@ -172,4 +172,31 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, updateUserProfile };
+const subscribeToChannel = async (req, res) => {
+  try {
+    // userID -> current user && channnelId -> userID of that channel's owner
+    const userID = req.user.ID;
+    const { channelID } = req.params;
+
+    // u cant subscribe to yourself
+    if (userID == channelID)
+      return res.status(403).json({ messsage: "You Cant Subscribe To Yourself", success: false });
+
+    // add to the subscribe array
+    await User.findByIdAndUpdate(userID, { $addToSet: { subscribedChannels: channelID } }, { new: true }).select(
+      "-password",
+    );
+
+    // inc the sub count
+    await User.findByIdAndUpdate(channelID, { $inc: { subscriber } }, { new: true }).select("-password");
+  } catch (error) {
+    console.log(`Error in Subscribig to Channel ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Subscribe Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, updateUserProfile, subscribeToChannel };
