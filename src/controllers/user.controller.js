@@ -219,4 +219,35 @@ const subscribeToChannel = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, updateUserProfile, subscribeToChannel };
+const unsubscribeToChannel = async (req, res) => {
+  try {
+    const userID = req.user.ID;
+    const { channelID } = req.params;
+
+    const findUser = await User.findById(userID).select("-password");
+    if (!findUser) return res.status(403).json({ message: "Request Denied", success: false });
+
+    // check if they are already subscribed
+    if (!findUser.subscribedChannels.includes(channelID)) {
+      return res.status(400).json({ message: "Not Subscribed to This Channel", success: false });
+    }
+
+    // Remove from subscribedChannels array
+    await User.findByIdAndUpdate(userID, { $pull: { subscribedChannels: channelID } });
+
+    // Decrease the subscriber count
+    await User.findByIdAndUpdate(channelID, { $inc: { subscriber: -1 } });
+
+    // final response
+    res.status(200).json({ message: `Unsubscribed successfully`, success: true });
+  } catch (error) {
+    console.log(`Error in Unsubscribing to Channel ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Unsubscribe Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, updateUserProfile, subscribeToChannel, unsubscribeToChannel };
