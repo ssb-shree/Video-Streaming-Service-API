@@ -189,4 +189,42 @@ const findVideoByID = async (req, res) => {
   }
 };
 
-export { uploadVideo, updateVideo, deleteVideo, getAllVideos, getMyVideos, findVideoByID };
+const getVideoByTages = async (req, res) => {
+  try {
+    const tag = req.params.tag;
+    const videos = await Video.find({ tags: tag }).sort({ createdAt: -1 });
+    res.status(200).json({ data: videos, success: true });
+  } catch (error) {
+    console.log(`Error in Finding Your Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Get Your Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+const getVideoByCategory = async (req, res) => {
+  try {
+    const videos = await Video.find({ category: req.params.category }).sort({ createdAt: -1 });
+    res.status(200).json({ data: videos, success: true });
+  } catch (error) {
+    console.log(`Error in Finding Your Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Get Your Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export {
+  uploadVideo,
+  updateVideo,
+  deleteVideo,
+  getAllVideos,
+  getMyVideos,
+  findVideoByID,
+  getVideoByTages,
+  getVideoByCategory,
+};

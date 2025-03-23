@@ -9,6 +9,8 @@ import {
   getAllVideos,
   getMyVideos,
   findVideoByID,
+  getVideoByTages,
+  getVideoByCategory,
 } from "../controllers/video.controller.js";
 
 import { checkAuth } from "../middlewares/auth.middleware.js";
@@ -24,5 +26,9 @@ router.get("/all", getAllVideos);
 router.get("/my-videos", checkAuth, getMyVideos);
 
 router.get("/find/:videoID", findVideoByID);
+
+router.get("/tags/:tag", getVideoByTages);
+
+router.get("/category/:category", getVideoByCategory);
 
 export default router;
