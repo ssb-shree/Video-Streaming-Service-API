@@ -140,4 +140,35 @@ const deleteVideo = async (req, res) => {
   }
 };
 
-export { uploadVideo, updateVideo, deleteVideo };
+const getAllVideos = async (req, res) => {
+  try {
+    // sorting it in newest video First order
+    const videos = await Video.find().sort({ createdAt: -1 });
+    res.status(200).json(videos);
+  } catch (error) {
+    console.log(`Error in Finding All Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Get All Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+const getMyVideos = async (req, res) => {
+  const userID = req.user.ID;
+  try {
+    // get all videos of user id = current users user id
+    const video = await Video.find({ userID }).sort({ createdAt: -1 });
+    res.status(200).json({ message: "found videos successfully", success: true, data: video });
+  } catch (error) {
+    console.log(`Error in Finding Your Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Get Your Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { uploadVideo, updateVideo, deleteVideo, getAllVideos, getMyVideos };
