@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import User from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
-import mongoose from "mongoose";
+import User from "../models/user.model.js";
+import Video from "../models/video.model.js";
+import Comment from "../models/comments.model.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -173,6 +174,57 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  const userID = req.user.ID;
+
+  try {
+    // find the USer
+    const findUser = await User.findById(userID);
+    if (!findUser) return res.status(404).json({ message: "User not found", success: false });
+
+    // remove the pfp of user from cloud
+    await cloudinary.uploader.destroy(findUser.logoID, { resource_type: "image" });
+
+    // find all videos uploaded by the user and delete them from cloud
+    const videosUploaded = await Video.find({ userID });
+    for (const video of videosUploaded) {
+      await cloudinary.uploader.destroy(video.thumbnailID, { resource_type: "image" });
+      await cloudinary.uploader.destroy(video.videoID, { resource_type: "video" });
+    }
+
+    // remove all videos entry from DB
+    await Video.deleteMany({ userID });
+
+    // Remove likes/dislikes from all videos
+    await Video.updateMany({ likedBy: userID }, { $pull: { likedBy: userID } });
+    await Video.updateMany({ dislikedBy: userID }, { $pull: { dislikedBy: userID } });
+
+    // Remove all comments done by this user
+    await Comment.deleteMany({ userID });
+
+    // Remove subscriptions where this user was subscribed to others
+    await User.updateMany({ subscribedChannels: userID }, { $pull: { subscribedChannels: userID } });
+
+    // Remove all subscribers from this user's channel
+    await User.updateMany(
+      { _id: { $in: findUser.subscribedChannels } }, // Finds all users in his subscribed channels array
+      { $inc: { subscriber: -1 } }, // Decrease subscriber count by 1 for each channel in his array
+    );
+
+    // Delete user from DB
+    await User.findByIdAndDelete(userID);
+
+    res.status(200).json({ message: "User deleted successfully", success: true });
+  } catch (error) {
+    console.log(`Error in Deleting User ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Delete User Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
 const subscribeToChannel = async (req, res) => {
   try {
     // userID -> current user && channnelId -> userID of that channel's owner
@@ -250,4 +302,4 @@ const unsubscribeToChannel = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, updateUserProfile, subscribeToChannel, unsubscribeToChannel };
+export { registerUser, loginUser, logoutUser, updateUserProfile, subscribeToChannel, unsubscribeToChannel, deleteUser };
