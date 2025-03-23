@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
+import mongoose from "mongoose";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -182,6 +183,12 @@ const subscribeToChannel = async (req, res) => {
     if (userID == channelID)
       return res.status(403).json({ messsage: "You Cant Subscribe To Yourself", success: false });
 
+    // check if already subscribed
+    const check = await User.findById(userID);
+    if (check.subscribedChannels.some((id) => id.toString() === channelID)) {
+      return res.status(403).json({ message: "Already Subscribed", success: false });
+    }
+
     // add to the subscribe array
     const currentUser = await User.findByIdAndUpdate(
       userID,
@@ -197,15 +204,13 @@ const subscribeToChannel = async (req, res) => {
     ).select("-password");
 
     //final response
-    res
-      .status(200)
-      .json({
-        message: `Subscribed to ${subscribeToChannel.channelName} successfully`,
-        success: true,
-        data: { user: currentUser, channel: subscribedChannel },
-      });
+    res.status(200).json({
+      message: `Subscribed to ${subscribedChannel.channelName} successfully`,
+      success: true,
+      data: { user: currentUser, channel: subscribedChannel },
+    });
   } catch (error) {
-    console.log(`Error in Subscribig to Channel ${error.message || error}`);
+    console.log(`Error in Subscribing to Channel ${error.message || error}`);
     res.status(500).json({
       message: "Unable to Subscribe Right Now Try Again Later",
       error: error.message || error,

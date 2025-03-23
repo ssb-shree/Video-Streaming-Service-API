@@ -33,10 +33,12 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
-    subscribedChannels: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+    subscribedChannels: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true },
 );
