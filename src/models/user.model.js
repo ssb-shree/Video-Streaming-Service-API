@@ -3,6 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const userSchema = new Schema(
   {
     channelName: {
+      unique: true,
       type: String,
       required: true,
     },

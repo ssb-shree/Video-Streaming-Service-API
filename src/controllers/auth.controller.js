@@ -125,4 +125,51 @@ const logoutUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser };
+const updateUserProfile = async (req, res) => {
+  const { channelName, password, email } = req.body;
+  // no empty field check if empty put the old fields
+
+  try {
+    // find the user
+    const findUser = await User.findById(req.user.ID);
+    if (!findUser) return res.status(404).json({ message: "User Not Found", success: false });
+
+    // verify email format
+    if (!emailRegex.test(email)) return res.status(409).json({ message: "Invalid Email Provided", success: false });
+
+    // hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+
+    // create the object of updated data
+    const updateData = { email, password: hashPassword, channelName };
+
+    // if new image provided update and cleanup the cloud strage
+    if (req.files && req.files.logo) {
+      const newLogo = await cloudinary.uploader.upload(req.files.logo.tempFilePath, {
+        resource_type: "image",
+        folder: "video-streaming-service-api/pfps",
+      });
+
+      updateData.logoUrl = newLogo.secure_url;
+      updateData.logoID = newLogo.public_id;
+
+      // destroy the old image
+      await cloudinary.uploader.destroy(findUser.logoID, { resourse_type: "image" });
+    }
+
+    // save the changes and send the updated data in response
+    const updatedUser = await User.findByIdAndUpdate(req.user.ID, { updateData }, { new: true });
+
+    res.status(200).json({ message: "User Updated Successfully", success: true, data: updatedUser });
+  } catch (error) {
+    console.log(`Error in Updatinng User ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Update User Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, updateUserProfile };
