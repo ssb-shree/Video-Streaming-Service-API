@@ -175,7 +175,13 @@ const findVideoByID = async (req, res) => {
   const { videoID } = req.params;
   try {
     // find video usinng id
-    const video = await Video.findById(videoID);
+    const video = await Video.findByIdAndUpdate(
+      videoID,
+      {
+        $addToSet: { viewedBy: req.user.ID },
+      },
+      { new: true },
+    );
     if (!video) return res.status(400).json({ message: "Video Not Found, Invalid video ID", success: false });
 
     res.status(200).json({ messsage: "Video Found", success: true, data: video });
