@@ -2,7 +2,14 @@ import { Router } from "express";
 
 const router = Router();
 
-import { uploadVideo, updateVideo, deleteVideo, getAllVideos, getMyVideos } from "../controllers/video.controller.js";
+import {
+  uploadVideo,
+  updateVideo,
+  deleteVideo,
+  getAllVideos,
+  getMyVideos,
+  findVideoByID,
+} from "../controllers/video.controller.js";
 
 import { checkAuth } from "../middlewares/auth.middleware.js";
 
@@ -15,5 +22,7 @@ router.delete("/delete/:videoID", checkAuth, deleteVideo);
 router.get("/all", getAllVideos);
 
 router.get("/my-videos", checkAuth, getMyVideos);
+
+router.get("/find/:videoID", findVideoByID);
 
 export default router;

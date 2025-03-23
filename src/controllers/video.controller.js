@@ -171,4 +171,22 @@ const getMyVideos = async (req, res) => {
   }
 };
 
-export { uploadVideo, updateVideo, deleteVideo, getAllVideos, getMyVideos };
+const findVideoByID = async (req, res) => {
+  const { videoID } = req.params;
+  try {
+    // find video usinng id
+    const video = await Video.findById(videoID);
+    if (!video) return res.status(400).json({ message: "Video Not Found, Invalid video ID", success: false });
+
+    res.status(200).json({ messsage: "Video Found", success: true, data: video });
+  } catch (error) {
+    console.log(`Error in Finding Your Video ${error.message || error}`);
+    res.status(500).json({
+      message: "Unable to Get Your Video Right Now Try Again Later",
+      error: error.message || error,
+      success: false,
+    });
+  }
+};
+
+export { uploadVideo, updateVideo, deleteVideo, getAllVideos, getMyVideos, findVideoByID };
