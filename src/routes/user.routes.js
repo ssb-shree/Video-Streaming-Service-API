@@ -20,6 +20,6 @@ router.get("/auth/logout", checkAuth, logoutUser);
 
 router.put("/auth/update", checkAuth, updateUserProfile);
 
-router.post("/subscribe/:channelID", subscribeToChannel);
+router.post("/subscribe/:channelID", checkAuth, subscribeToChannel);
 
 export default router;

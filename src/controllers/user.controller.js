@@ -183,12 +183,27 @@ const subscribeToChannel = async (req, res) => {
       return res.status(403).json({ messsage: "You Cant Subscribe To Yourself", success: false });
 
     // add to the subscribe array
-    await User.findByIdAndUpdate(userID, { $addToSet: { subscribedChannels: channelID } }, { new: true }).select(
-      "-password",
-    );
+    const currentUser = await User.findByIdAndUpdate(
+      userID,
+      { $addToSet: { subscribedChannels: channelID } },
+      { new: true },
+    ).select("-password");
 
     // inc the sub count
-    await User.findByIdAndUpdate(channelID, { $inc: { subscriber } }, { new: true }).select("-password");
+    const subscribedChannel = await User.findByIdAndUpdate(
+      channelID,
+      { $inc: { subscriber: 1 } },
+      { new: true },
+    ).select("-password");
+
+    //final response
+    res
+      .status(200)
+      .json({
+        message: `Subscribed to ${subscribeToChannel.channelName} successfully`,
+        success: true,
+        data: { user: currentUser, channel: subscribedChannel },
+      });
   } catch (error) {
     console.log(`Error in Subscribig to Channel ${error.message || error}`);
     res.status(500).json({
