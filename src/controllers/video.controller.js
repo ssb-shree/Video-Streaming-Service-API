@@ -25,7 +25,7 @@ const uploadVideo = async (req, res) => {
       folder: "video-streaming-service-api/thumbnails",
     });
 
-    const newVideo = Video.create({
+    const newVideo = await Video.create({
       title,
       description,
       category,
@@ -39,9 +39,15 @@ const uploadVideo = async (req, res) => {
 
     if (!newVideo) {
       console.log("failed to make entry in mongo db");
+
+      // Cleanup Uploaded Files from the Cloud incase of an insertion error in DB
+      await cloudinary.uploader.destroy(thumbNailUpload.public_id);
+      await cloudinary.uploader.destroy(videoUpload.public_id);
+
+      res.status(500).json({ message: "Failed to save Data in DB, Try Again Later", success: false });
     }
 
-    res.status(201).json({ message: "New Video Uploaded", data: newVideo, success: false });
+    res.status(201).json({ message: "New Video Uploaded", data: newVideo, success: true });
   } catch (error) {
     console.log(`Error in Uploading Video ${error.message || error}`);
     res.status(500).json({
