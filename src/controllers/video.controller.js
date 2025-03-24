@@ -1,3 +1,4 @@
+import Comment from "../models/comments.model.js";
 import User from "../models/user.model.js";
 import Video from "../models/video.model.js";
 import cloudinary from "../utils/cloudinary.js";
@@ -123,6 +124,9 @@ const deleteVideo = async (req, res) => {
     // check video to be deleted is uploaded by the current user
     if (findVideo.userID.toString() !== req.user.ID.toString())
       return res.status(403).json({ message: "Unauthorized request ", success: false });
+
+    // delete all the comments on the video from DB
+    await Comment.deleteMany({ videoID });
 
     // now clean up the cloud storage
     await cloudinary.uploader.destroy(findVideo.thumbnailID, { resource_type: "image" });

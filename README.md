@@ -39,15 +39,7 @@ A `.env.sample` file is provided as a reference. Copy it and rename it to `.env`
 cp .env.sample .env
 ```
 Then, update the values in the `.env` file as needed.  
-Create a `.env` file and add the following:  
-```env
-PORT=8080
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-CLOUDINARY_CLOUDNAME=your_cloudinary_cloud_name
-CLOUDINARY_APIKEY=your_cloudinary_api_key
-CLOUDINARY_APISECRET=your_cloudinary_api_secret
-```
+
 
 ### 4. Run the Server  
 - Development Mode:  
